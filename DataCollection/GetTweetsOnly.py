@@ -2,16 +2,19 @@ import twint
 import time
 import os
 
-# get all the folders inside of a folder
+
+
 
 def getTweets():
-    complete_list_of_users = []
+    with open('../DataProcessing/graph_users.txt', 'r') as f:
+        lines = f.readlines()
+        complete_list_of_users = []
+    for line in lines:
+        complete_list_of_users.append(line.strip())
 
-    complete_list_of_users = os.listdir("Daddythompson2")
     print(complete_list_of_users)
     print(len(complete_list_of_users))
-    files_done = []
-    files_done = os.listdir("Daddythompson2-Level2-tweets")
+    files_done = os.listdir("Graph-Users-tweets")
     print(len(files_done))
 
     files_done_new = [x[:-4] for x in files_done]
@@ -34,7 +37,7 @@ def getTweets():
         a.Custom = ["tweet", "retweets", "id"]
         # POISED limits the tweets to 300, the most recent ones
         a.Limit = 500
-        a.Output = "Daddythompson2-Level2-tweets/"+user+".csv"
+        a.Output = "Graph-Users-tweets/"+user+".csv"
         twint.run.Profile(a)
 
 
