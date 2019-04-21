@@ -49,43 +49,43 @@ def get_user_information(user):
         pass
 
 
+def return_associated_user(subdir, user):
+    with open(user+"-2/"+subdir+"/stronglyConnectedUsers.txt", "r") as f:
+        lines = f.readlines()
+    strongly_connected_users = []
+    for line in lines:
+        strongly_connected_users.append(line.strip())
+    if ".DS_Store" in strongly_connected_users:
+        strongly_connected_users.remove(".DS_Store")
+    return strongly_connected_users
+
+
 def get_followers(sub_user, user):
-    # get the list of followers
-    os.chdir(user)
     try:
-        with open(sub_user+"/followers.csv") as f:
-            followers_list = f.readlines()
-        # you may also want to remove whitespace characters like `\n` at the end of each line
-        followers_list = [x.strip() for x in followers_list]
-        f.close()
-        # delete "username" from the list
-        if "username" in followers_list:
-            followers_list.remove("username")
+        with open(user+"-3/"+sub_user+"/followers.csv", "r") as f:
+            lines = f.readlines()
+        followers = []
+        for line in lines:
+            followers.append(line.strip())
+        if "username" in followers:
+            followers.remove("username")
+        return followers
     except FileNotFoundError:
-        followers_list = []
-        pass
-    os.chdir("..")
-    return followers_list
+        return None
 
 
 def get_followees(sub_user, user):
-    os.chdir(user)
     try:
-        with open(sub_user+"/following.csv") as f:
-            followee_list = f.readlines()
-        # you may also want to remove whitespace characters like `\n` at the end of each line
-            followee_list = [x.strip() for x in followee_list]
-        f.close()
-        # delete "username" from the list
-        if "username" in followee_list:
-            followee_list.remove("username")
+        with open(user+"-3/"+sub_user+"/following.csv", "r") as f:
+            lines = f.readlines()
+        followees = []
+        for line in lines:
+            followees.append(line.strip())
+        if "username" in followees:
+            followees.remove("username")
+        return followees
     except FileNotFoundError:
-        followee_list = []
-        pass
-    os.chdir("..")
-
-    return followee_list
-
+        return None
 
 # level 1
 def level1(user):
@@ -131,7 +131,7 @@ def leve2(user):
     return
 
 
-def level2_ass_users_list(user):
+def level2_associated_users_list(user):
     list_of_users = os.listdir(user)
     list_of_users.remove("stronglyConnectedUsers.txt")
     for x in list_of_users:
@@ -147,23 +147,52 @@ def level2_ass_users_list(user):
 
 def level3(user):
     # get complete list of followers and followees
-    list_of_directories = os.listdir(user+"-hop1")
+    list_of_directories = os.listdir(user+"-2")
 
     print(len(list_of_directories))
     input("Enter Key")
-    if "associated_users.txt" in list_of_directories:
-        list_of_directories.remove("associated_users.txt")
+    if "stronglyConnectedUsers.txt" in list_of_directories:
+        list_of_directories.remove("stronglyConnectedUsers.txt")
+    if ".DS_Store" in list_of_directories:
+        list_of_directories.remove(".DS_Store")
     level2_list = []
     for item in list_of_directories:
-        level2_list.extend(only_return_followers_followees(item, user))
+        level2_list.extend(return_associated_user(item, user))
         #print(item)
-    os.chdir(user)
+    os.chdir(user+"-3")
     print("total users: "+str(len(level2_list)))
     print("total unique users: "+str(len(set(level2_list))))
     input("Enter key")
-
+    directories_done = os.listdir("../"+user + "-3")
+    for item in set(level2_list):
+        if item in directories_done:
+            level2_list.remove(item)
+    print("total users: "+str(len(level2_list)))
+    print("total unique users: "+str(len(set(level2_list))))
+    input("Enter key")
     pool2 = ThreadPool(100)
     pool2.map(get_user_information, level2_list)
+
+
+def level3_associated_users_list(user):
+    list_of_users = os.listdir(user+"-3")
+    if "stronglyConnectedUsers.txt" in list_of_users:
+        list_of_users.remove("stronglyConnectedUsers.txt")
+    if ".DS_Store" in list_of_users:
+        list_of_users.remove(".DS_Store")
+    for x in list_of_users:
+        stronglyConnectedUsers = []
+        followers = get_followers(x, user)
+        followees = get_followees(x, user)
+        try:
+            for y in followers:
+                if y in followees:
+                    stronglyConnectedUsers.append(y)
+        except TypeError:
+            pass
+        with open(user+"-3/"+x+'/stronglyConnectedUsers.txt', 'w') as users_file:
+            for item in stronglyConnectedUsers:
+                users_file.write("%s\n" % item)
 
 
 def threading(user):
@@ -175,7 +204,9 @@ def threading(user):
 
     # level 2
     #leve2(user)
-    level2_ass_users_list(user)
+    #level2_associated_users_list(user)
+    #level3(user)
+    level3_associated_users_list(user)
 
 
 
