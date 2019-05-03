@@ -41,7 +41,6 @@ def getTweets():
         complete_list_of_users.remove(user)
     print(complete_list_of_users)
     print(len(complete_list_of_users))
-    input("")
     #for user in complete_list_of_users:
     #    call_twint(user)
     pool2 = ThreadPool(3)
@@ -56,6 +55,7 @@ def getTweets():
 getTweets()
 while(1):
     try:
+
         getTweets()
     except TimeoutError:
         time.sleep(60)
