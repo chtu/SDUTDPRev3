@@ -62,7 +62,7 @@ def return_associated_user(subdir, user):
 
 def get_followers(sub_user, user):
     try:
-        with open(user+"-3/"+sub_user+"/followers.csv", "r") as f:
+        with open(user+"/"+sub_user+"/followers.csv", "r") as f:
             lines = f.readlines()
         followers = []
         for line in lines:
@@ -76,7 +76,7 @@ def get_followers(sub_user, user):
 
 def get_followees(sub_user, user):
     try:
-        with open(user+"-3/"+sub_user+"/following.csv", "r") as f:
+        with open(user+"/"+sub_user+"/following.csv", "r") as f:
             lines = f.readlines()
         followees = []
         for line in lines:
@@ -134,13 +134,18 @@ def leve2(user):
 def level2_associated_users_list(user):
     list_of_users = os.listdir(user)
     list_of_users.remove("stronglyConnectedUsers.txt")
+    if ".DS_Store" in list_of_users:
+        list_of_users.remove(".DS_Store")
     for x in list_of_users:
         stronglyConnectedUsers = []
         followers = get_followers(x, user)
         followees = get_followees(x, user)
-        for y in followers:
-            if y in followees:
-                stronglyConnectedUsers.append(y)
+        try:
+            for y in followers:
+                if y in followees:
+                    stronglyConnectedUsers.append(y)
+        except:
+            pass
         with open(user+"/"+x+'/stronglyConnectedUsers.txt', 'w') as users_file:
             for item in stronglyConnectedUsers:
                 users_file.write("%s\n" % item)
@@ -204,9 +209,9 @@ def threading(user):
 
     # level 2
     #leve2(user)
-    #level2_associated_users_list(user)
+    level2_associated_users_list(user)
     #level3(user)
-    level3_associated_users_list(user)
+    #level3_associated_users_list(user)
 
 
 
@@ -215,7 +220,7 @@ def threading(user):
 
 
 
-threading('Daddythompson2')
+threading('WhiteMediafrica')
 
 # test seed catattack
 # catattack101
